@@ -4,21 +4,21 @@ pipeline {
     environment {
         AWS_REGION = 'us-east-1'
     }
+        stage('Init') {
+            steps {
+                script {
+                    {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
   stages {
     stage('Destroy') {
             steps {
                 script {
                     withAWS(region: AWS_REGION, credentials: 'AWS') {
                         sh 'terraform destroy -auto-approve'
-                    }
-                }
-            }
-        }
-        stage('Init') {
-            steps {
-                script {
-                    {
-                        sh 'terraform init'
                     }
                 }
             }

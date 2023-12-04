@@ -4,7 +4,7 @@ resource "tls_private_key" "ssh_key" {
 }
 
 resource "aws_key_pair" "ec2_key_pair" {
-  key_name   = "ec2-key"
+  key_name   = var.key_name 
   public_key = tls_private_key.ssh_key.public_key_openssh
 }
 

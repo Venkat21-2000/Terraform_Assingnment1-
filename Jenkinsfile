@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            choices: ['Destroy', 'Plan and Apply'],
+            description: 'Select an action',
+            name: 'Destroy_Or_Apply'
+        )
+    }
+
     environment {
         AWS_REGION = 'us-east-1'
     }
@@ -13,6 +21,9 @@ pipeline {
     }
   }
   stage('Destroy') {
+      when {
+                expression { params.Destroy_Or_Apply == 'Destroy' }
+            }
     steps {
       script {
         withAWS(region: AWS_REGION, credentials: 'AWS') {
@@ -21,6 +32,18 @@ pipeline {
       }
     }
   }
+
+    stage('Other Steps') {
+            when {
+                expression { params.Destroy_Or_Apply == 'Plan and Apply' }
+            }
+            steps {
+                script {
+                    // This stage will only execute when DESTROY_ACTION is 'Do Not Destroy'
+                    echo 'Performing other steps...'
+                }
+            }
+        }
   stage('Plan') {
     steps {
       script {

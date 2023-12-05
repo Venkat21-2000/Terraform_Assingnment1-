@@ -33,17 +33,12 @@ pipeline {
     }
   }
 
-    stage('Other Steps') {
+stage('Other Steps') {
             when {
                 expression { params.Destroy_Or_Apply == 'Plan and Apply' }
             }
-            steps {
-                script {
-                    // This stage will only execute when DESTROY_ACTION is 'Do Not Destroy'
-                    echo 'Performing other steps...'
-                }
-            }
-        }
+            
+        
   stage('Plan') {
     steps {
       script {
@@ -70,5 +65,6 @@ pipeline {
                 }
             }
          }
+    }
     }
 }

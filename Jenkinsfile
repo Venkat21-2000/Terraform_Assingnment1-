@@ -15,60 +15,60 @@ pipeline {
 
     stages {
         stage('Init') {
-            steps {
-                script {
-                    sh 'terraform init'
-                }
-            }
+      steps {
+        script {
+          sh 'terraform init'
+        }
+      }
         }
 
         stage('Destroy') {
-            when {
-                expression { params.Destroy_Or_Apply == 'Destroy' }
-            }
-            steps {
-                script {
-                    withAWS(region: AWS_REGION, credentials: 'AWS') {
-                        sh 'terraform destroy -auto-approve'
-                    }
-                }
-            }
+      when {
+        expression { params.Destroy_Or_Apply == 'Destroy' }
+      }
+      steps {
+        script {
+          withAWS(region: AWS_REGION, credentials: 'AWS') {
+            sh 'terraform destroy -auto-approve'
+          }
         }
+      }
+    }
 
         stage('Plan and Apply') {
-            when {
-                expression { params.Destroy_Or_Apply == 'Plan and Apply' }
+      when {
+        expression { params.Destroy_Or_Apply == 'Plan and Apply' }
+      }
+      stages {
+        stage('Plan') {
+          steps {
+            script {
+              withAWS(region: AWS_REGION, credentials: 'AWS') {
+                sh 'terraform plan'
+              }
             }
-            stages {
-                stage('Plan') {
-                    steps {
-                        script {
-                            withAWS(region: AWS_REGION, credentials: 'AWS') {
-                                sh 'terraform plan'
-                            }
-                        }
-                    }
-                }
+          }
+        }
 
-                stage('Apply') {
-                    steps {
-                        script {
-                            withAWS(region: AWS_REGION, credentials: 'AWS') {
-                                sh 'terraform apply -auto-approve'
-                            }
-                        }
-                    }
-                }
+        stage('Apply') {
+          steps {
+            script {
+              withAWS(region: AWS_REGION, credentials: 'AWS') {
+                sh 'terraform apply -auto-approve'
+              }
             }
+          }
         }
 
         stage('Get private key') {
             steps {
                 script {
-                    sh "sudo chmod 400 /var/lib/jenkins/workspace/Terraform_pipeline/private_key.pem"
-                    sh "sudo cp /var/lib/jenkins/workspace/Terraform_pipeline/private_key.pem /home/sigmoid/"
-                }
+                sh 'sudo chmod 400 /var/lib/jenkins/workspace/Terraform_pipeline/private_key.pem'
+                sh 'sudo cp /var/lib/jenkins/workspace/Terraform_pipeline/private_key.pem /home/sigmoid/'
+              }
             }
+          }
         }
+      }
     }
 }
